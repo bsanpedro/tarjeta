@@ -87,9 +87,17 @@ body:before{content:"";position:fixed;inset:0;background:linear-gradient(180deg,
     } else { copiar(); }
   };
   function copiar(){
-    if (navigator.clipboard && navigator.clipboard.writeText) {
-      navigator.clipboard.writeText(URL_TARJETA).then(function(){ toast('Liga copiada'); }, function(){ prompt('Copia la liga:', URL_TARJETA); });
-    } else { prompt('Copia la liga:', URL_TARJETA); }
+    var ok=function(){ toast('Liga copiada'); };
+    function viejo(){
+      var t=document.createElement('textarea'); t.value=URL_TARJETA; t.setAttribute('readonly','');
+      t.style.position='fixed'; t.style.top='-1000px'; document.body.appendChild(t);
+      t.select(); t.setSelectionRange(0,t.value.length);
+      var r=false; try{ r=document.execCommand('copy'); }catch(e){}
+      document.body.removeChild(t);
+      if(r) ok(); else prompt('Copia la liga:',URL_TARJETA);
+    }
+    if(navigator.clipboard && navigator.clipboard.writeText && window.isSecureContext){ navigator.clipboard.writeText(URL_TARJETA).then(ok,viejo); }
+    else viejo();
   }
   $('btnCopy').onclick = copiar;
 })();

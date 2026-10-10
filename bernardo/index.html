@@ -222,8 +222,16 @@ footer img{height:44px;opacity:.9;margin-bottom:8px}
   function toast(t){ var e=$('toast'); e.textContent=t; e.classList.add('on'); setTimeout(function(){ e.classList.remove('on'); },2200); }
   function copiar(){
     var ok=function(){ toast('Liga copiada'); };
-    if(navigator.clipboard && navigator.clipboard.writeText){ navigator.clipboard.writeText(URL_TARJETA).then(ok,function(){ prompt('Copia la liga:',URL_TARJETA); }); }
-    else prompt('Copia la liga:',URL_TARJETA);
+    function viejo(){
+      var t=document.createElement('textarea'); t.value=URL_TARJETA; t.setAttribute('readonly','');
+      t.style.position='fixed'; t.style.top='-1000px'; document.body.appendChild(t);
+      t.select(); t.setSelectionRange(0,t.value.length);
+      var r=false; try{ r=document.execCommand('copy'); }catch(e){}
+      document.body.removeChild(t);
+      if(r) ok(); else prompt('Copia la liga:',URL_TARJETA);
+    }
+    if(navigator.clipboard && navigator.clipboard.writeText && window.isSecureContext){ navigator.clipboard.writeText(URL_TARJETA).then(ok,viejo); }
+    else viejo();
   }
   $('btnQR').onclick=function(){ $('qrModal').classList.add('on'); };
   $('btnClose').onclick=function(){ $('qrModal').classList.remove('on'); };
